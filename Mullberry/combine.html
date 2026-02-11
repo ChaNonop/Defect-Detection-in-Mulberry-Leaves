@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8">
+    <title>Mulberry Leaf Inspector | ระบบตรวจสอบใบหม่อนอัจฉริยะ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        background: #f9fafb url('https://www.qsds.go.th/images/bg_thai_pattern.png') repeat;
+        font-family: "TH Sarabun New", sans-serif;
+      }
+      .navbar {
+        background: linear-gradient(90deg, #3b7a57, #6aa84f);
+        color: white;
+      }
+      .navbar-brand, .navbar small {
+        color: white !important;
+      }
+      .img-preview { 
+        max-width: 100%; 
+        height: auto; 
+        border: 2px solid #c9d6c5; 
+        padding: 4px; 
+        background: #fff; 
+        border-radius: 10px;
+      }
+      .hidden { display: none; }
+      .card {
+        border-radius: 15px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+      .recommend {
+        background: #e9f7ef;
+        border-left: 4px solid #4caf50;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+      footer {
+        background: #3b7a57;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white shadow-sm">
+  <div class="container d-flex align-items-center">
+    <!-- โลโก้หลัก -->
+    <img src="https://foodindustry.kmitl.ac.th/sites/default/files/inline-images/2Main%20Logo%20KMITL_Eng%20Orange.png"
+         alt="KMITL Logo" height="90" class="me-3">
+
+    <!-- โลโก้ Sitename -->
+    <img src="https://www.kmitl.ac.th/sites/default/files/2025-03/Sitename.png"
+         alt="Sitename Logo" height="70">
+
+    <!-- ข้อความด้านขวา -->
+    <div class="ms-auto text-end">
+      <small class="text-muted">G3 Mulberry Leaf classification</small>
+    </div>
+  </div>
+</nav>
+
+    <div class="container mt-4">
+      
+      <!-- Upload Section -->
+      <div class="card p-4" id="upload-card">
+        <h5 class="fw-bold text-success">อัปโหลดภาพใบหม่อนเพื่อตรวจสอบ 🍃</h5>
+        <p class="text-muted">
+          ระบบตรวจสอบชนิดใบหม่อน — สามารถแยกแยะใบดี ใบเชื้อรา ใบถูกแมลงกัด และใบที่ไม่ใช่ใบหม่อน
+        </p>
+        <form id="uploadForm" onsubmit="handleUpload(event)">
+          <div class="mb-3">
+            <input class="form-control" type="file" id="fileInput" accept="image/*" required>
+          </div>
+          <button class="btn btn-success" type="submit" id="uploadBtn" disabled>อัปโหลดและตรวจสอบ</button>
+        </form>
+        <div id="loadingMessage" class="mt-3 hidden">
+          <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">กำลังประมวลผล...</span>
+          </div>
+          <span class="ms-2">กำลังประมวลผลภาพและวิเคราะห์ผล...</span>
+        </div>
+      </div>
+
+      <!-- Result Section -->
+      <div class="card p-4 mt-4 hidden" id="result-card">
+        <h5 class="fw-bold text-primary">ผลการวิเคราะห์ใบหม่อน ✨</h5>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <h6>ภาพที่อัปโหลด</h6>
+            <img id="uploadedImage" class="img-preview" alt="Uploaded Mulberry Leaf">
+          </div>
+          <div class="col-md-6">
+            <h6>ความมั่นใจของการทำนาย</h6>
+            <canvas id="predictionChart"></canvas>
+            <hr>
+            
+            <h5 class="text-success">ผลที่ทำนายได้: <span class="fw-bold" id="topClass"></span></h5>
+            <div id="recommendationText" class="recommend"></div>
+
+            <h6 class="mt-3">ค่าความน่าจะเป็นทั้งหมด</h6>
+            <ul id="allProbsList" class="list-unstyled small"></ul>
+            <button class="btn btn-outline-success mt-2" onclick="resetPage()">ทำนายใหม่อีกครั้ง</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Knowledge Section -->
+      <div class="card p-4 mt-5">
+        <h4 class="fw-bold text-success">ความรู้เกี่ยวกับใบหม่อนและการเลี้ยงไหม 🐛</h4>
+        <p>
+          ใบหม่อนเป็นอาหารหลักของตัวไหม ซึ่งมีผลโดยตรงต่อคุณภาพของเส้นไหมและการเจริญเติบโตของหนอนไหม  
+          ใบหม่อนที่ดีควรเป็นใบอ่อนพอเหมาะ สีเขียวสด ไม่มีเชื้อรา ไม่มีแมลงกัดกิน  
+          กรมหม่อนไหมแนะนำให้ปลูกพันธุ์หม่อนที่เหมาะสมกับพื้นที่ เช่น พันธุ์นครราชสีมา และเชียงใหม่ 60  
+        </p>
+        <ul>
+          <li><strong>ใบดี (Good leaf):</strong> เหมาะสมสำหรับเลี้ยงไหมโดยตรง</li>
+          <li><strong>ใบเชื้อรา (Fungal leaf):</strong> ไม่ควรใช้เลี้ยงไหม อาจทำให้ตัวไหมป่วย</li>
+          <li><strong>ใบถูกแมลงกัด (Insect-eaten leaf):</strong> คุณภาพลดลง ควรแยกก่อนนำไปใช้</li>
+          
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 ขอบคุณข้อมูลจาก กรมหม่อนไหม กระทรวงเกษตรและสหกรณ์ | พัฒนาโดย G3 mulberry leaf classification</p>
+    </footer>
+
+    <!-- Script -->
+    <script>
+      const API_ENDPOINT = 'https://g3weds.consolutechcloud.com/backend/predict';
+      const classNames = ['Fungal leaves', 'Good leaves', 'Insect-eaten leaves', 'Not mulberry leaf'];
+      const recommendationMap = {
+        'Fungal leaves': '❗ ใบมีเชื้อรา — แนะนำให้แยกและทำลาย ห้ามใช้เลี้ยงไหมโดยเด็ดขาด',
+        'Good leaves': '✅ ใบสมบูรณ์ — ใช้เลี้ยงไหมได้ทันที เก็บในที่ร่มและระบายอากาศดี',
+        'Insect-eaten leaves': '⚠️ ใบถูกแมลงกัด — ใช้บางส่วนได้ คัดเฉพาะใบที่ไม่เสียหายมาก',
+        'Not mulberry leaf': '🚫 ไม่ใช่ใบหม่อน — ห้ามใช้เลี้ยงไหม อาจเกิดอันตรายต่อหนอนไหม'
+      };
+
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const uploadCard = document.getElementById('upload-card');
+      const resultCard = document.getElementById('result-card');
+      const loadingMessage = document.getElementById('loadingMessage');
+      const uploadedImage = document.getElementById('uploadedImage');
+      const topClassSpan = document.getElementById('topClass');
+      const recommendationP = document.getElementById('recommendationText');
+      const allProbsList = document.getElementById('allProbsList');
+      let chartInstance = null;
+
+      fileInput.addEventListener('change', (event) => {
+          uploadBtn.disabled = event.target.files.length === 0;
+      });
+
+      function resetPage() {
+          uploadCard.classList.remove('hidden');
+          resultCard.classList.add('hidden');
+          fileInput.value = '';
+          uploadBtn.disabled = true;
+          if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+      }
+
+      function createChart(probs) {
+          const ctx = document.getElementById('predictionChart').getContext('2d');
+          const combined = classNames.map((name, i) => ({ name, prob: probs[i] }));
+          combined.sort((a, b) => b.prob - a.prob);
+          chartInstance = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: combined.map(item => item.name),
+                  datasets: [{
+                      label: 'Confidence (%)',
+                      data: combined.map(item => item.prob * 100),
+                      backgroundColor: ['#ff6384','#4caf50','#ffb74d','#9e9e9e'],
+                      borderWidth: 1
+                  }]
+              },
+              options: { indexAxis: 'y', scales: { x: { beginAtZero: true, max: 100 }}, plugins: { legend: { display: false } } }
+          });
+      }
+
+      async function handleUpload(e) {
+          e.preventDefault();
+          if (fileInput.files.length === 0) return;
+          const file = fileInput.files[0];
+          const reader = new FileReader();
+          reader.onloadstart = () => { uploadBtn.disabled = true; loadingMessage.classList.remove('hidden'); };
+          reader.onload = async (e) => {
+              const base64Image = e.target.result;
+              uploadedImage.src = base64Image;
+              try {
+                  const response = await fetch(API_ENDPOINT, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ image_base64: base64Image })
+                  });
+                  const data = await response.json();
+                  const topClass = data.predicted_class_name;
+                  topClassSpan.textContent = topClass;
+                  recommendationP.textContent = recommendationMap[topClass] || '';
+                  const logits = data.prediction[0];
+                  const exp = logits.map(Math.exp);
+                  const sumExp = exp.reduce((a,b)=>a+b,0);
+                  const probs = exp.map(v => v/sumExp);
+                  allProbsList.innerHTML = '';
+                  classNames.forEach((name, i) => {
+                      const li = document.createElement('li');
+                      li.innerHTML = `<strong>${name}:</strong> ${(probs[i]*100).toFixed(2)}%`;
+                      allProbsList.appendChild(li);
+                  });
+                  createChart(probs);
+                  uploadCard.classList.add('hidden');
+                  resultCard.classList.remove('hidden');
+              } catch (error) {
+                  alert('การทำนายล้มเหลว: ' + error.message);
+              } finally {
+                  loadingMessage.classList.add('hidden');
+                  uploadBtn.disabled = false;
+              }
+          };
+          reader.readAsDataURL(file);
+      }
+    </script>
+  </body>
+</html>
