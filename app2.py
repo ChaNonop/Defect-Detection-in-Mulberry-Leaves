@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/predict": {"origins": "https://g3weds.consolutechcloud.com"}})
 
 # ===== CONFIG =====
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "final_model2_fix2.h5")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "model.h5")
 
 # ชื่อคลาส (4 คลาส)
 class_names = ['Fungal leaf', 'Good leaf', 'Insect-eaten leaf', 'Not mulberry leaf']
