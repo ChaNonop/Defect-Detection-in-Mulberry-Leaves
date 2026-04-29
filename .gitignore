@@ -3,9 +3,9 @@ train/
 val/
 test/ 
 
-*.h5
+# *.h5
 *.keras
-*.tflite
+# *.tflite
 
 myenv/
 __pycache__/
