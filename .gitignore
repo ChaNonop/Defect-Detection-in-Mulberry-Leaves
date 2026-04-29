@@ -1,0 +1,16 @@
+Mulberry dataset/
+train/
+val/
+test/ 
+
+*.h5
+*.keras
+*.tflite
+
+myenv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
