@@ -2,10 +2,14 @@ Mulberry dataset/
 train/
 val/
 test/
+/Dataset
+/Dataset_Stage1
+/class_mulberry
+/class_not_mulberry
 
-# *.h5
+*.h5
 *.keras
-# *.tflite
+*.tflite
 
 myenv/
 __pycache__/
@@ -17,3 +21,5 @@ __pycache__/
 node_modules/
 uploads/
 # App/backend/model/*.tflite
+
+/Mullberry_leaf_optimized.ipynb
