@@ -1,7 +1,7 @@
 Mulberry dataset/
 train/
 val/
-test/ 
+test/
 
 # *.h5
 *.keras
@@ -14,3 +14,6 @@ __pycache__/
 .vscode/
 .idea/
 
+node_modules/
+uploads/
+# App/backend/model/*.tflite
