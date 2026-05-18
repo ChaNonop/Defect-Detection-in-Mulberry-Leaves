@@ -14,3 +14,4 @@ gdown
 fastapi
 uvicorn
 python-multipart
+kagglehub
